@@ -265,7 +265,7 @@ function App() {
                 </Suspense>
                 <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
                     <planeGeometry args={[50, 50]} />
-                    <meshStandardMaterial color="#55a630" />
+                    <meshStandardMaterial color="#007f5f" />
                 </mesh>
                 <OrbitControls enableRotate enableZoom enablePan rotateSpeed={1} zoomSpeed={0.8} panSpeed={0.8} dampingFactor={0.1} minDistance={2} maxDistance={15} />
             </Canvas>
