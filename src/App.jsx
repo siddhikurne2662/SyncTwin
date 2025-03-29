@@ -183,7 +183,7 @@ function Model({ data }) {
             modelRef.current.traverse((child) => {
                 if (child.isMesh) {
                     child.material = new MeshStandardMaterial({ 
-                        color: "#cad2c5",  // Deep Blue
+                        color: "#6c757d",  // Deep Blue
                         metalness: 0.6, 
                         roughness: 0.4 
                     });
