@@ -70,6 +70,7 @@ headers = {
     "Content-Type": "application/json"
 }
 
+
 # Function to send data
 def send_sensor_data():
     data = {
