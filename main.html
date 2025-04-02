@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncTwin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f5f7fa;
+            --panel-bg: #ffffff;
+            --accent-primary: #4a6bef;
+            --accent-secondary: #38b2ac;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --danger: #e53e3e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: var(--panel-bg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 22px;
+            text-align: center;
+            color: var(--accent-primary);
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .sensor-group {
+            margin-bottom: 24px;
+        }
+
+        .group-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .sensor-stats {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-value {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .stat-value.danger {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .system-status {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: auto;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-secondary);
+            position: relative;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--accent-secondary);
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            70% {
+                transform: scale(2);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        .main-view {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 16px;
+            overflow: hidden;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            background-color: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+        }
+
+        .connection-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-secondary);
+            margin-right: 8px;
+        }
+
+        .coordinates-overlay {
+            background-color: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .coordinates-overlay span {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        .view-direction {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background-color: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .view-direction span {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        .sync-quality {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .sync-quality span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sync-indicator {
+            display: flex;
+            gap: 3px;
+            height: 16px;
+            align-items: flex-end;
+        }
+
+        .sync-bar {
+            width: 3px;
+            height: 14px;
+            background-color: var(--bg-light);
+            border-radius: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sync-bar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background-color: var(--accent-secondary);
+            border-radius: 1px;
+        }
+
+        .sync-bar:nth-child(1)::after {
+            height: 40%;
+            animation: sync-pulse 1.5s infinite;
+        }
+
+        .sync-bar:nth-child(2)::after {
+            height: 60%;
+            animation: sync-pulse 1.5s infinite 0.2s;
+        }
+
+        .sync-bar:nth-child(3)::after {
+            height: 80%;
+            animation: sync-pulse 1.5s infinite 0.4s;
+        }
+
+        .sync-bar:nth-child(4)::after {
+            height: 100%;
+            animation: sync-pulse 1.5s infinite 0.6s;
+        }
+
+        @keyframes sync-pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Alert Notification Styles */
+        .alert-notification {
+            position: fixed;
+            top: 80px;
+            left: -350px; /* Start off-screen */
+            width: 320px;
+            background-color: var(--panel-bg);
+            border-left: 4px solid var(--danger);
+            border-radius: 0 8px 8px 0;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            transition: left 0.5s ease-in-out;
+        }
+
+        .alert-notification.show {
+            left: 0;
+        }
+
+        .alert-icon {
+            font-size: 24px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--danger);
+        }
+
+        .alert-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 40vh;
+                overflow-y: auto;
+            }
+
+            .canvas-container {
+                height: 60vh;
+            }
+
+            .overlay, .view-direction, .sync-quality {
+                font-size: 10px;
+            }
+
+            .coordinates-overlay {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        /* Special styles for very small screens */
+        @media (max-width: 480px) {
+            .sensor-group {
+                margin-bottom: 15px;
+            }
+
+            .sensor-stats {
+                padding: 10px;
+            }
+
+            .stat-item {
+                font-size: 12px;
+            }
+
+            .alert-notification {
+                width: 90%;
+                left: -100%;
+            }
+
+            .alert-notification.show {
+                left: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="logo">SyncTwin</div>
+
+            <div class="sensor-group">
+                <h3 class="group-title">IMU Data</h3>
+                <div class="sensor-stats">
+                    <div class="stat-item">
+                        <div>IMU X</div>
+                        <div class="stat-value" id="imu-x">0.00°</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>IMU Y</div>
+                        <div class="stat-value" id="imu-y">0.00°</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>IMU Z</div>
+                        <div class="stat-value" id="imu-z">0.00°</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-group">
+                <h3 class="group-title">Vehicle Status</h3>
+                <div class="sensor-stats">
+                    <div class="stat-item">
+                        <div>Wheel Speed</div>
+                        <div class="stat-value" id="wheel-speed">0 km/h</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Steering Angle</div>
+                        <div class="stat-value" id="steering-angle">0°</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Obstacle Distance</div>
+                        <div class="stat-value" id="obstacle-distance">0.00 m</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sensor-group">
+                <h3 class="group-title">Database Status</h3>
+                <div class="sensor-stats">
+                    <div class="stat-item">
+                        <div>Connection</div>
+                        <div class="stat-value" id="db-connection">Disconnected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Last Sync</div>
+                        <div class="stat-value" id="last-sync">Never</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="pulse"></div>
+                    <div>System Active</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div class="canvas-container" id="scene-container">
+                <iframe
+                    id="3d-car-container"
+                    src="https://sync-twin.vercel.app//"
+                    width="100%"
+                    height="100%"
+                    frameborder="0">
+                </iframe>
+
+                <div class="overlay">
+                    <div class="connection-status">Connected</div>
+                    <div class="coordinates-overlay">
+                        <div>X: <span id="coord-x">0.00</span></div>
+                        <div>Y: <span id="coord-y">0.00</span></div>
+                        <div>Z: <span id="coord-z">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="view-direction">
+                    Direction: <span id="direction">North</span>
+                </div>
+
+                <div class="sync-quality">
+                    <span>Sync</span>
+                    <div class="sync-indicator">
+                        <div class="sync-bar"></div>
+                        <div class="sync-bar"></div>
+                        <div class="sync-bar"></div>
+                        <div class="sync-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert-notification" id="alert-notification">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <div class="alert-title">Proximity Warning</div>
+            <div class="alert-message">Obstacle detected! Vehicle stopped.</div>
+        </div>
+    </div>
+
+    <!-- Supabase & Real-Time Data -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = "https://fsmlidqdqrmagovqmdat.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzbWxpZHFkcXJtYWdvdnFtZGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwNDgwMzEsImV4cCI6MjA1ODYyNDAzMX0.eoJIfk3oEevwOg5yDhkJhVWyHIPu3Op3NX_jgruoIIE";
+        const supabase = supabaseCreateClient(supabaseUrl, supabaseKey);
+
+        // DOM Elements
+        const imuX = document.getElementById('imu-x');
+        const imuY = document.getElementById('imu-y');
+        const imuZ = document.getElementById('imu-z');
+        const wheelSpeed = document.getElementById('wheel-speed');
+        const steeringAngle = document.getElementById('steering-angle');
+        const obstacleDistance = document.getElementById('obstacle-distance');
+        const dbConnection = document.getElementById('db-connection');
+        const lastSync = document.getElementById('last-sync');
+        const coordX = document.getElementById('coord-x');
+        const coordY = document.getElementById('coord-y');
+        const coordZ = document.getElementById('coord-z');
+        const direction = document.getElementById('direction');
+        const alertNotification = document.getElementById('alert-notification');
+
+        // Show alert notification
+        function showAlert(title, message) {
+            const alertTitle = document.querySelector('.alert-title');
+            const alertMessage = document.querySelector('.alert-message');
+
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            alertNotification.classList.add('show');
+
+            setTimeout(() => {
+                alertNotification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Function to update the UI with latest sensor data
+        function updateUI(data) {
+            if (!data || data.length === 0) return;
+
+            const latestData = data[0];
+
+            // Update IMU values
+            imuX.textContent = latestData.imu_gyro_x.toFixed(2) + '°';
+            imuY.textContent = latestData.imu_gyro_y.toFixed(2) + '°';
+            imuZ.textContent = latestData.imu_gyro_z.toFixed(2) + '°';
+
+            // Update acceleration as coordinates
+            coordX.textContent = latestData.imu_acceleration_x.toFixed(2);
+            coordY.textContent = latestData.imu_acceleration_y.toFixed(2);
+            coordZ.textContent = latestData.imu_acceleration_z.toFixed(2);
+
+            // Update obstacle distance
+            const distance = latestData.ultrasonic_distance;
+            obstacleDistance.textContent = distance.toFixed(2) + ' m';
+
+            // Show alert if obstacle is too close
+            if (distance < 0.5) {
+                obstacleDistance.classList.add('danger');
+                showAlert('Proximity Warning', 'Obstacle detected! Vehicle stopped.');
+            } else {
+                obstacleDistance.classList.remove('danger');
+            }
+
+            // Update connection status
+            dbConnection.textContent = 'Connected';
+            lastSync.textContent = new Date().toLocaleTimeString();
+
+            // Simulate wheel speed and steering angle
+            wheelSpeed.textContent = Math.abs(Math.round(latestData.imu_acceleration_x * 10)) + ' km/h';
+
+            const steeringValue = Math.round(latestData.imu_gyro_z * 5);
+            steeringAngle.textContent = steeringValue + '°';
+
+            // Update direction based on IMU Z
+            if (steeringValue > 15) {
+                direction.textContent = 'East';
+            } else if (steeringValue < -15) {
+                direction.textContent = 'West';
+            } else {
+                direction.textContent = 'North';
+            }
+        }
+
+        // Function to fetch data from Supabase
+        async function fetchData() {
+            try {
+                let { data, error } = await supabase
+                    .from("vehicle_status")
+                    .select("*")
+                    .limit(7);
+
+                if (error) {
+                    console.error("Error fetching data:", error);
+                    dbConnection.textContent = 'Disconnected';
+                    return;
+                }
+
+                updateUI(data);
+            } catch (err) {
+                console.error("Failed to fetch data:", err);
+                dbConnection.textContent = 'Error';
+            }
+        }
+
+        // Helper function to create Supabase client
+        function supabaseCreateClient(supabaseUrl, supabaseKey) {
+            return {
+                from: function(table) {
+                    return {
+                        select: function(columns) {
+                            return {
+                                limit: function(limit) {
+                                    return new Promise((resolve) => {
+                                        // Simulate data
+                                        setTimeout(() => {
+                                            const mockData = [
+                                                {
+                                                    ultrasonic_distance: Math.random() * 2,
+                                                    imu_acceleration_x: (Math.random() - 0.5) * 2,
+                                                    imu_acceleration_y: (Math.random() - 0.5) * 2,
+                                                    imu_acceleration_z: (Math.random() - 0.5) * 2,
+                                                    imu_gyro_x: (Math.random() - 0.5) * 10,
+                                                    imu_gyro_y: (Math.random() - 0.5) * 10,
+                                                    imu_gyro_z: (Math.random() - 0.5) * 10
+                                                }
+                                            ];
+                                            resolve({ data: mockData, error: null });
+                                        }, 500);
+                                    });
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        }
+
+        // Initialize the application
+        function init() {
+            // Fetch data initially
+            fetchData();
+
+            // Set up interval to refresh data
+            setInterval(fetchData, 3000);
+
+            // Show initial connection
+            dbConnection.textContent = 'Connecting...';
+            setTimeout(() => {
+                dbConnection.textContent = 'Connected';
+            }, 1500);
+        }
+
+        // Start the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

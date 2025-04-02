@@ -81,7 +81,7 @@ def send_sensor_data():
         "imu_gyro_x": round(random.uniform(-180, 180), 2),
         "imu_gyro_y": round(random.uniform(-180, 180), 2),
         "imu_gyro_z": round(random.uniform(-180, 180), 2),
-        "steering_angle": round(random.uniform(-45, 45), 2)  # Simulating left (-) and right (+) turns
+        "steering_angle": round(random.uniform(-45, 45), 2) 
     }
 
     try:
