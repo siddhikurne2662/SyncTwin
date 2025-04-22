@@ -1,12 +1,31 @@
-# React + Vite
+## 🚗 Digital Twin for Autonomous Vehicle (ESP32 + React + Supabase)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project demonstrates a **Digital Twin** model of an autonomous vehicle using **ESP32** for hardware integration and a **React + Vite + Three.js** stack for 3D visualization. Real-time sensor data (IMU and Ultrasonic) is transmitted to **Supabase** and visualized live in a browser using a 3D car model.
 
-Currently, two official plugins are available:
+### 🧩 Project Overview:
+- **Problem Statement:** Developing a Digital Twin for Autonomous Vehicle using ESP32.
+- **Hardware:** A miniature car setup with ESP32, IMU, and ultrasonic sensors.
+- **Data Flow:**
+  - Sensor data sent from ESP32 to Supabase in real-time.
+  - React web app fetches and displays this data using Three.js to control the model's motion, steering, and wheel dynamics.
+- **Frontend:** React, Vite, Three.js, @react-three/fiber, @react-three/drei.
+- **Backend/Data:** Supabase Realtime Database.
+- **Visualization:** 3D car movement, steering angle changes, wheel rotation—all synced with real-time sensor input.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🛠️ Technologies Used:
+- ESP32 (Hardware Microcontroller)
+- Supabase (Backend & Realtime DB)
+- React, Vite (Frontend)
+- Three.js + React Three Fiber (3D Visualization)
+- Python (Sensor data simulator for testing)
 
-## Expanding the ESLint configuration
+### 📁 Directory Highlights:
+- `/src/components/VehicleModel.jsx` – Handles 3D model rendering and live data updates.
+- `/backend/sensor_simulator.py` – Simulates sensor input to Supabase during testing.
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🙌 Team:
+Developed as part of an industrial project by **Team Saviours**.
+
+> *Frontend/Software:* Ruchi Mulik, Siddhi  
+> *Hardware/Integration:* Kaustub Hire (Team Leader), Vignesh Kamath, Ali
+
