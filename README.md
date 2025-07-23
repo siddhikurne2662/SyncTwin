@@ -27,5 +27,5 @@ This project demonstrates a **Digital Twin** model of an autonomous vehicle usin
 Developed as part of an industrial project by **Team Saviours**.
 
 > *Frontend/Software:* Ruchi Mulik, Siddhi  
-> *Hardware/Integration:* Kaustub Hire (Team Leader), Vignesh Kamath, Ali
+> *Hardware/Integration:* Kaustubh Hire (Team Leader), Vignesh Kamath, Ali
 
